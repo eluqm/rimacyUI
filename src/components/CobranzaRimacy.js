@@ -19,7 +19,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 import Switch from '@material-ui/core/Switch';
 import Checkbox from '@material-ui/core/Checkbox';
-
+//import Globals from './Globals';
 
 const styles = theme=>({
 
@@ -101,6 +101,7 @@ class CobranzaRimacy extends React.Component {
         _jueves:false,
         _viernes:false,
         _totaldaysvalue:1,
+        hostname:"",
         //antoine: true,
     };
 //menu list
@@ -143,7 +144,8 @@ class CobranzaRimacy extends React.Component {
         //    console.log(data.data)
         //}
         //)
-        fetch("http://localhost:8181/v1/addcobranza", {
+
+        fetch(this.props.hostdata.host+"v1/addcobranza", {
             method: 'POST',
             mode: 'cors',
             headers: {
@@ -214,7 +216,9 @@ class CobranzaRimacy extends React.Component {
     };
 
     componentDidMount() {
-        fetch("http://localhost:8181/v1/allempl")
+
+        console.log(this.props.hostdata.host+"v1/allempl")
+        fetch(this.props.hostdata.host+"v1/allempl")
             .then((response) => {
                 return response.json();
             }).then(data => {
@@ -226,7 +230,7 @@ class CobranzaRimacy extends React.Component {
             console.log(error);
         });
        // labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWid
-        fetch("http://localhost:8181/v1/allzones")
+        fetch(this.props.hostdata.host+"v1/allzones")
             .then((response) => {
                 return response.json();
             }).then(data => {

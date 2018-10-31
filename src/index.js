@@ -35,6 +35,13 @@ const styles = theme => ({
     },
 });
 
+var DATA = {
+    name: 'John Doe',
+    imgURL: 'https://loremflickr.com/320/240',
+    followerList: ['Follower-1', 'Follower-2', 'Follower-3'],
+    host: 'http://f30c36c6.ngrok.io/',
+}
+
 class App extends Component{
     state = {
         value: 0,
@@ -70,12 +77,12 @@ class App extends Component{
                 {value === 0 && <TabContainer>
                     {/*ReactDOM.render(<MultiSelectRimacy/>, document.getElementById('multiRuta'));
                     */}
-                    <MultiSelectRimacy/>
+                    <MultiSelectRimacy />
                     </TabContainer>}
                 {value === 1 && <TabContainer>
                     {/*ReactDOM.render(, document.getElementById('cobranza'));</TabContainer>}
                     */}
-                    <CobranzaRimacy />
+                    <CobranzaRimacy hostdata={DATA}/>
                 </TabContainer>
 
                 }

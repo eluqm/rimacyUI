@@ -12,6 +12,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Paper from "@material-ui/core/Paper/Paper";
 
 
 
@@ -159,9 +160,9 @@ class MultipleSelectRimacy extends React.Component {
         const { classes } = this.props;
 
         return (
-            <div className={classes.root}>
+            <div>
 
-
+                <Paper className={classes.root} elevation={1}>
 
                 <form className={classes.container} noValidate autoComplete="off">
                     <TextField
@@ -174,7 +175,8 @@ class MultipleSelectRimacy extends React.Component {
                         variant="outlined"
                     />
                 </form>
-
+                </Paper>
+                <Paper className={classes.root} elevation={1}>
                 <FormControl className={classes.formControl}>
 
                     <InputLabel htmlFor="select-multiple-chip">Rutas</InputLabel>
@@ -204,12 +206,13 @@ class MultipleSelectRimacy extends React.Component {
                     {/*<div className>
                         Selected Values: {JSON.stringify(this.state.nameObject)}
                     </div>*/}
-                    <Button variant="outlined" onClick={this.handleClick} color="primary" className={classes.button}>
-                        Crear Zona
 
-                    </Button>
                 </FormControl>
+                </Paper>
+                <Button variant="outlined" onClick={this.handleClick} color="primary" className={classes.button}>
+                    Crear Zona
 
+                </Button>
             </div>
         );
     }

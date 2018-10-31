@@ -15,6 +15,7 @@ import InputRimacy from './components/InputRimacy';
 import MultiSelectRimacy from './components/MultiSelectRimacy';
 import CobranzaRimacy from './components/CobranzaRimacy';
 import SwitchLabels from './components/SwitchLabels';
+import TablePagination from './components/TablePagination';
 function TabContainer(props) {
     return (
         <Typography component="div" style={{ padding: 8 * 3 }}>
@@ -58,7 +59,7 @@ class App extends Component{
                     >
                         <Tab label="Crear Zona" />
                         <Tab label="Asignar Ruta" />
-                        <Tab label="Item Four" />
+                        <Tab label="Zonas" />
                         {/*}  <Tab label="Item Three" />
                         <Tab label="Item Four" />
                         <Tab label="Item Five" />
@@ -79,7 +80,7 @@ class App extends Component{
 
                 }
                 {value === 2 && <TabContainer>
-                    <SwitchLabels/>
+                    <TablePagination/>
                 </TabContainer>
                 }
                 {/* {value === 3 && <TabContainer>Item Four</TabContainer>}

@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
+
 import FormGroup from '@material-ui/core/FormGroup';
 import MenuItem from '@material-ui/core/MenuItem';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
@@ -17,7 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
+
 import Switch from '@material-ui/core/Switch';
 import Checkbox from '@material-ui/core/Checkbox';
 
@@ -78,7 +77,7 @@ function getStyles(name, that) {
 }
 class CobranzaRimacy extends React.Component {
     state = {
-        date : new Date(),
+        date : new Date("2017-05-24"),
         auth: true,
         anchorEl: null,
         empls: [],
@@ -94,6 +93,7 @@ class CobranzaRimacy extends React.Component {
         checkedA:true,
         checkedB:true,
         commentInput: '',
+        pickerInput:'',
         valueday:0,
         _lunes:false,
         _martes:false,
@@ -131,31 +131,74 @@ class CobranzaRimacy extends React.Component {
         this.setState({ anchorEl: null });
     };
 
-    handleClick = this.handleClick.bind(this);
+   // handleClick = this.handleClick.bind(this);
 
-    handleClick () {
-        console.log(this.state.selectedTeam);
-        fetch("http://localhost:8181/v1/getRutabyEmpl/"+this.state.selectedTeam)
-            .then((response)=>{
-                return response.json();
-            }).then(data=> {
-            this.subComponentTable(data.data)
-            console.log(data.data)
-        })
+    handleClick = event =>{
+        //console.log(this.state.selectedTeam);
+        //fetch("http://localhost:8181/v1/getRutabyEmpl/"+this.state.selectedTeam)
+        //    .then((response)=>{
+        //        return response.json();
+        //    }).then(data=> {
+        //    this.subComponentTable(data.data)
+        //    console.log(data.data)
+        //}
+        //)
+        fetch("http://localhost:8181/v1/addcobranza", {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+            //    mode:'no-cors',
+
+            body:JSON.stringify( {
+
+                "dias": this.state._totaldaysvalue,
+                "fecha_init":this.state.pickerInput,
+                "frecuencia_week":this.state._week,
+                "frecuencia_month":this.state._monthly,
+                "id_empleado" :this.state.selectedTeam,
+                "id_zona" :this.state._selectedZona,
+                "comentario":this.state.commentInput,
+            })
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson)
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        console.log("button data")
+        console.log(this.state.commentInput);
+        console.log(this.state._totaldaysvalue);
+        console.log("semanal: "+this.state._week);
+        console.log("mensual:" +this.state._monthly);
+        console.log("id_zona:" +this.state._selectedZona);
+        console.log("id_empleado" +this.state.selectedTeam);
+        console.log("fecha:" +this.state.pickerInput);
+        // console.log(data.data)
+       // console.log(data.data)
+       // console.log(data.data)
+
 
     }
 
     handleChangeFreq = xstate => event => {
         this.setState({ [xstate[0]]: event.target.checked });
-        //this.setState({_week:})
-        console.log(this.state._week);
-        console.log(this.state._monthly);
+        this.setState({ [xstate[1]]: !event.target.checked });
+
     };
     handleChangeInput = commnent => event => {
         this.setState({
             [commnent]: event.target.value,
         });
     };
+    handleChangePickerInput = pickers => event => {
+        this.setState({
+           [pickers]: event.target.value,
+        });
+    }
 
     handleChangeWeek = name => event => {
         this.setState({ [name]: event.target.checked });
@@ -208,14 +251,14 @@ class CobranzaRimacy extends React.Component {
         return (
 
 
-
+            <div>
                 <Paper className={classes.root} elevation={1}>
 
 
 
 
 
-                    <FormControl variant="filled" className={classes.formControl}>
+                    <FormControl variant="outlined" className={classes.formControl}>
 
                             <InputLabel htmlFor="filled-age-simple">Empleado</InputLabel>
                             <Select value={this.state.selectedTeam}
@@ -224,14 +267,18 @@ class CobranzaRimacy extends React.Component {
                                 input={<FilledInput name="Seleccione Nombre" id="filled-age-simple" />}
                             </Select>
                     </FormControl>
-
+                </Paper>
+                <Paper className={classes.root} elevation={2}>
                     <form className={classes.container} noValidate autoComplete="off">
                         <TextField
                             id="date"
                             label="Frecuencia"
                             type="date"
-                            defaultValue={this.state.date}
+                            defaultValue= {new Date("yyyy-MM-dd")}
+
                             className={classes.textField}
+                            value={this.state.pickerInput}
+                            onChange={this.handleChangePickerInput('pickerInput')}
                             InputLabelProps={{
                             shrink: true,
                         }}
@@ -377,29 +424,30 @@ class CobranzaRimacy extends React.Component {
 
 
                     </FormControl>
-
+                </Paper>
+                <Paper className={classes.root} elevation={1}>
                         <TextField
                             id="outlined-name"
                             label="Comentarios"
                             className={classes.textField}
                             value={this.state.commentInput}
-                            onChange={this.handleChangeInput('commnentInput')}
+                            onChange={this.handleChangeInput('commentInput')}
                             margin="normal"
                             variant="outlined"
                         />
 
 
-
+                </Paper>
 
                     <Button variant="outlined" onClick={this.handleClick} color="primary" className={classes.button}>
                         Asignar Zona
-                        <p>{this.state._totaldaysvalue}</p>
+
                     </Button>
 
 
-    </Paper>
 
 
+            </div>
 
         );
     }

@@ -39,7 +39,8 @@ var DATA = {
     name: 'John Doe',
     imgURL: 'https://loremflickr.com/320/240',
     followerList: ['Follower-1', 'Follower-2', 'Follower-3'],
-    host: 'http://2540ff47.ngrok.io/',
+    host: 'http://174.138.48.60:8080/rimacy/',
+    //host:'http://localhost:8080/',
 }
 
 class App extends Component{
@@ -77,7 +78,7 @@ class App extends Component{
                 {value === 0 && <TabContainer>
                     {/*ReactDOM.render(<MultiSelectRimacy/>, document.getElementById('multiRuta'));
                     */}
-                    <MultiSelectRimacy />
+                    <MultiSelectRimacy hostdata={DATA}/>
                     </TabContainer>}
                 {value === 1 && <TabContainer>
                     {/*ReactDOM.render(, document.getElementById('cobranza'));</TabContainer>}
@@ -87,7 +88,7 @@ class App extends Component{
 
                 }
                 {value === 2 && <TabContainer>
-                    <TablePagination/>
+                    <TablePagination hostdata={DATA}/>
                 </TabContainer>
                 }
                 {/* {value === 3 && <TabContainer>Item Four</TabContainer>}

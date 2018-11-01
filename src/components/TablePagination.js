@@ -223,7 +223,7 @@ class EnhancedTable extends React.Component {
         rowsPerPage: 5,
     };
     componentDidMount() {
-        fetch("http://localhost:8181/v1/allzones")
+        fetch(this.props.hostdata.host+"v1/allzones")
             .then((response) => {
                 return response.json();
             }).then(data => {

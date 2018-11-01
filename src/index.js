@@ -39,7 +39,7 @@ var DATA = {
     name: 'John Doe',
     imgURL: 'https://loremflickr.com/320/240',
     followerList: ['Follower-1', 'Follower-2', 'Follower-3'],
-    host: 'http://f30c36c6.ngrok.io/',
+    host: 'http://2540ff47.ngrok.io/',
 }
 
 class App extends Component{

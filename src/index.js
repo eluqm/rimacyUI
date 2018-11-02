@@ -39,8 +39,8 @@ var DATA = {
     name: 'John Doe',
     imgURL: 'https://loremflickr.com/320/240',
     followerList: ['Follower-1', 'Follower-2', 'Follower-3'],
-    //host: 'http://174.138.48.60:8080/rimacy/',
-    host:'http://localhost:8080/',
+    host: 'http://174.138.48.60:8080/rimacy/',
+    //host:'http://localhost:8080/',
 }
 
 class App extends Component{

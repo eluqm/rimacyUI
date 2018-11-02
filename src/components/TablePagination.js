@@ -21,7 +21,15 @@ import { lighten } from '@material-ui/core/styles/colorManipulator';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
-
+import Dialog from "@material-ui/core/Dialog/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText/DialogContentText";
+import DialogActions from "@material-ui/core/DialogActions/DialogActions";
+import Slide from "@material-ui/core/Slide/Slide";
+function Transition(props) {
+    return <Slide direction="up" {...props} />;
+}
 let counter = 0;
 function createData(name, calories, fat, carbs, protein) {
     counter += 1;
@@ -59,7 +67,36 @@ const rows = [
     //{ id: 'carbs', numeric: true, disablePadding: false, label: 'Carbs (g)' },
     //{ id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
 ];
+class SimpleDialog extends React.Component {
+    handleClose = () => {
+        this.props.onClose();
+    };
 
+    handleListItemClick = value => {
+        this.props.onClose(value);
+    };
+
+    render() {
+        const {classes, onClose, selectedValue, label, ...other} = this.props;
+
+        return (
+            <Dialog onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
+                <DialogTitle id="simple-dialog-title">{label}</DialogTitle>
+                <div>
+
+                </div>
+            </Dialog>
+        );
+    }
+}
+
+SimpleDialog.propTypes = {
+    classes: PropTypes.object.isRequired,
+    onClose: PropTypes.func,
+    // selectedValue: PropTypes.string,
+};
+
+const SimpleDialogWrapped = withStyles(styles)(SimpleDialog);
 class EnhancedTableHead extends React.Component {
     createSortHandler = property => event => {
         this.props.onRequestSort(event, property);
@@ -215,6 +252,8 @@ class EnhancedTable extends React.Component {
         order: 'asc',
         orderBy: 'calories',
         selected: [],
+        selected_state:[],
+        id_pivot:[],
         datas: [
             createData('Cupcake', 305, 3.7, 67, 4.3),
             createData('Donut', 452, 25.0, 51, 4.9),
@@ -232,31 +271,38 @@ class EnhancedTable extends React.Component {
         ],
         page: 0,
         rowsPerPage: 5,
+        open: false,
+        open_validation: false,
+        open_confirmation: false,
     };
     componentDidMount() {
         fetch(this.props.hostdata.host+"v1/allzones")
             .then((response) => {
                 return response.json();
             }).then(data => {
-            console.log(data.data[1][0]);
+
             this.setState({
                 datas:     data.data.map(tbldata=>{return {id:tbldata[0],name:tbldata[1],estado:tbldata[2]}}),
                 selected:  data.data.map(tbldata1=>{return (parseInt(tbldata1[2])==1) && parseInt(tbldata1[0])
-                }),
 
+                }),
+                selected_state: data.data.map(tbldata1=>{return (parseInt(tbldata1[2])==1)? parseInt(tbldata1[2]):0}),
+                id_pivot: data.data.map(tbldata1=>{return parseInt(tbldata1[0])}),
             })
 
 
             let elects =[]
+            let elects_state =[]
             elects=Array.from(this.state.selected);
-
-
+            elects_state=Array.from(this.state.selected_state);
+            console.log(this.state.id_pivot)
             console.log(elects)
-
+            console.log("state: "+elects_state)
              let elects2 = elects.filter(item => item !== false)
             console.log(elects2)
             this.setState({selected: elects2});
-
+            //this.setState({selected_state: elects_state.filter(items => items !== false)});
+            console.log(this.state.selected_state)
         }).catch(error => {
             console.log(error);
         });
@@ -276,28 +322,55 @@ class EnhancedTable extends React.Component {
 
     handleSelectAllClick = event => {
         //this.setState({selected:this.state.selected.compact});
-
+        const {selected_state} = this.state;
+        let new_selected=selected_state;
+        console.log("copia:"+new_selected)
         if (event.target.checked) {
             this.setState(state => ({ selected: state.datas.map(n => n.id) }));
+            //this.setState({ selected_state: slice(0,this.state.selected_state.length,1)});
+            for(var i = 0, value = 1, size = new_selected.length, array = new Array(new_selected.length); i < size; i++) array[i] = value;
+            //new_selected.slice(0,new_selected.length,"1");
+            this.setState({selected_state:array});
             return;
         }
+        for(var i = 0, value = 0, size = new_selected.length, array = new Array(new_selected.length); i < size; i++) array[i] = value;
+        this.setState({selected_state:array});
         this.setState({ selected: [] });
     };
 
     handleClick = (event, id) => {
         console.log(this.state.selected);
+        console.log(this.state.selected_state);
+        console.log(this.state.id_pivot);
+        //console.log(id);
+
         const { selected } = this.state;
+        const { selected_state } = this.state;
+        const { id_pivot } = this.state;
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
-
-
+        let newSelected_state = selected_state;
+        let newId_pivot = id_pivot;
+        //console.log("estados binarios: "+ newSelected_state)
         if (selectedIndex === -1) {
             newSelected = newSelected.concat(selected, id);
+           // console.log("indice :"+selectedIndex)
+           //console.log("primer valr "+newSelected_state[0])
+            //newSelected_state = newSelected_state.concat(selected_state,1);
+          //  console.log("encontre el elemento :"+id_pivot.indexOf(id))
+            newSelected_state.splice(newId_pivot.indexOf(id),1,1);
+            //this.setState({})
+            //selected_state[id_pivot.indexOf(id)]=1;
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
+            newSelected_state.splice(newId_pivot.indexOf(id),1,0);
+            console.log("indice :"+selectedIndex)
         } else if (selectedIndex === selected.length - 1) {
             newSelected = newSelected.concat(selected.slice(0, -1));
+            newSelected_state.splice(newId_pivot.indexOf(id),1,0);
+            console.log("indice :"+selectedIndex)
         } else if (selectedIndex > 0) {
+            newSelected_state.splice(newId_pivot.indexOf(id),1,0);
             newSelected = newSelected.concat(
                 selected.slice(0, selectedIndex),
                 selected.slice(selectedIndex + 1),
@@ -305,6 +378,9 @@ class EnhancedTable extends React.Component {
         }
 
         this.setState({ selected: newSelected });
+        this.setState({ selected_state: newSelected_state });
+        this.setState({id_pivot:newId_pivot});
+
     };
 
     handleChangePage = (event, page) => {
@@ -316,11 +392,61 @@ class EnhancedTable extends React.Component {
     };
 
     isSelected = id => this.state.selected.indexOf(id) !== -1;
+    handleClickOpenDialog = () => {
+        this.setState({open: true});
+    };
+    handleCloseDialog = () => {
+        this.setState({open: false});
+    };
+    handleCloseDialogConfirm = event => {
+        this.setState({open: false});
+        this.handleClick_postReq();
+    };
+    handleClose_Confirmation = () => {
+        this.setState({open_confirmation: false});
+    };
+    handleClick_postReq =() =>
+    {
+      console.log("ya llegué aca")
+        fetch(this.props.hostdata.host + "v1/updatezonastate", {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+
+
+
+            body: JSON.stringify({
+
+                "id_list": this.state.id_pivot,
+                "state_list": this.state.selected_state,
+                "selected_list":this.state.selected,
+                //"frecuencia_week": this.state._week,
+                //"frecuencia_month": this.state._monthly,
+                //"id_empleado": this.state.selectedTeam,
+                //"id_zona": this.state._selectedZona,
+                //"comentario": this.state.commentInput,
+            })
+        }).then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson)
+                this.setState({open_confirmation: true})
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
     handleClick_Activate  = event=> {
         console.log("....:::::")
         console.log(
             this.state.selected
         )
+        console.log(
+            this.state.selected_state
+        )
+        this.setState({open: true});
+       // this.forceUpdate()
     };
     render() {
         const { classes } = this.props;
@@ -378,6 +504,43 @@ class EnhancedTable extends React.Component {
                             )}
                         </TableBody>
                     </Table>
+                    <Dialog
+                        open={this.state.open}
+                        TransitionComponent={Transition}
+                        keepMounted
+                        onClose={this.handleClose}
+                        aria-labelledby="alert-dialog-slide-title"
+                        aria-describedby="alert-dialog-slide-description"
+                    >
+                        <DialogTitle id="alert-dialog-slide-title">
+                            {"seguro?"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-slide-description">
+                                actualizar....?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.handleCloseDialog} color="primary">
+                                Disagree
+                            </Button>
+                            <Button onClick={this.handleCloseDialogConfirm} color="primary">
+                                Agree
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <SimpleDialogWrapped
+                        //selectedValue={this.state.selectedValue}
+                        label={"LLenar todos los campos!!!!!!"}
+                        open={this.state.open_validation}
+                        onClose={this.handleClose_Validation}
+                    />
+                    <SimpleDialogWrapped
+                        //selectedValue={this.state.selectedValue}
+                        label={"Se a creado una nueva zona!!!!!!"}
+                        open={this.state.open_confirmation}
+                        onClose={this.handleClose_Confirmation}
+                    />
                 </div>
                 <TablePagination
                     component="div"

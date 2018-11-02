@@ -307,7 +307,7 @@ class CobranzaRimacy extends React.Component {
             console.log(error);
         });
         // labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWid
-        fetch(this.props.hostdata.host + "v1/allzones")
+        fetch(this.props.hostdata.host + "v1/allzones2")
             .then((response) => {
                 return response.json();
             }).then(data => {
@@ -562,7 +562,7 @@ class CobranzaRimacy extends React.Component {
                 />
                 <SimpleDialogWrapped
                     //selectedValue={this.state.selectedValue}
-                    label={"Se a creado una nueva zona!!!!!!"}
+                    label={"operacon ralizada!!!!!"}
                     open={this.state.open_confirmation}
                     onClose={this.handleClose_Confirmation}
                 />

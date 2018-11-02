@@ -18,6 +18,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import { lighten } from '@material-ui/core/styles/colorManipulator';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import Button from '@material-ui/core/Button';
+import Icon from '@material-ui/core/Icon';
 
 let counter = 0;
 function createData(name, calories, fat, carbs, protein) {
@@ -52,7 +55,7 @@ function getSorting(order, orderBy) {
 const rows = [
     { id: 'name', numeric: false, disablePadding: true, label: 'Nombre Zona' },
     //{ id: 'denominacion', numeric: true, disablePadding: false, label: 'Calories' },
-    { id: 'estado', numeric: true, disablePadding: false, label: 'Activo' },
+   // { id: 'estado', numeric: true, disablePadding: false, label: 'Activo' },
     //{ id: 'carbs', numeric: true, disablePadding: false, label: 'Carbs (g)' },
     //{ id: 'protein', numeric: true, disablePadding: false, label: 'Protein (g)' },
 ];
@@ -137,10 +140,13 @@ const toolbarStyles = theme => ({
     title: {
         flex: '0 0 auto',
     },
+    rightIcon: {
+        marginLeft: theme.spacing.unit,
+    },
 });
 
 let EnhancedTableToolbar = props => {
-    const { numSelected, classes } = props;
+    const { numSelected, func_save,classes } = props;
 
     return (
         <Toolbar
@@ -151,7 +157,7 @@ let EnhancedTableToolbar = props => {
             <div className={classes.title}>
                 {numSelected > 0 ? (
                     <Typography color="inherit" variant="subtitle1">
-                        {numSelected} selected
+                        {numSelected} Zonas Activas
                     </Typography>
                 ) : (
                     <Typography variant="h6" id="tableTitle">
@@ -162,10 +168,8 @@ let EnhancedTableToolbar = props => {
             <div className={classes.spacer} />
             <div className={classes.actions}>
                 {numSelected > 0 ? (
-                    <Tooltip title="Delete">
-                        <IconButton aria-label="Delete">
-                            <DeleteIcon />
-                        </IconButton>
+                    <Tooltip title="guardar cambios" >
+                        <Button onClick={func_save}>Guardar</Button>
                     </Tooltip>
                 ) : (
                     <Tooltip title="Filter list">
@@ -182,6 +186,7 @@ let EnhancedTableToolbar = props => {
 EnhancedTableToolbar.propTypes = {
     classes: PropTypes.object.isRequired,
     numSelected: PropTypes.number.isRequired,
+    func_save:PropTypes.func.isRequired,
 };
 
 EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
@@ -196,6 +201,12 @@ const styles = theme => ({
     },
     tableWrapper: {
         overflowX: 'auto',
+    },
+    button: {
+        margin: theme.spacing.unit,
+    },
+    extendedIcon: {
+        marginRight: theme.spacing.unit,
     },
 });
 
@@ -229,17 +240,23 @@ class EnhancedTable extends React.Component {
             }).then(data => {
             console.log(data.data[1][0]);
             this.setState({
-                datas:data.data.map(tbldata=>{return {id:tbldata[0],name:tbldata[1],estado:tbldata[2]}})
+                datas:     data.data.map(tbldata=>{return {id:tbldata[0],name:tbldata[1],estado:tbldata[2]}}),
+                selected:  data.data.map(tbldata1=>{return (parseInt(tbldata1[2])==1) && parseInt(tbldata1[0])
+                }),
+
             })
-            console.log(this.state.datas);
-            // names= data.data;
-            //names1 = data.data.map(team => { return {value:team[0],display: team[1],name_ruta:team[3]} })
-            //names=names1
-            //console.log("names data");
-            //console.log(names);
-            //names=data.data.map(team => { return {val:team[0]}});
-            //this.setState({ name: names1 });
-            //this.setState({name: [""].concat(names1)});
+
+
+            let elects =[]
+            elects=Array.from(this.state.selected);
+
+
+            console.log(elects)
+
+             let elects2 = elects.filter(item => item !== false)
+            console.log(elects2)
+            this.setState({selected: elects2});
+
         }).catch(error => {
             console.log(error);
         });
@@ -258,6 +275,8 @@ class EnhancedTable extends React.Component {
     };
 
     handleSelectAllClick = event => {
+        //this.setState({selected:this.state.selected.compact});
+
         if (event.target.checked) {
             this.setState(state => ({ selected: state.datas.map(n => n.id) }));
             return;
@@ -266,6 +285,7 @@ class EnhancedTable extends React.Component {
     };
 
     handleClick = (event, id) => {
+        console.log(this.state.selected);
         const { selected } = this.state;
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
@@ -296,7 +316,12 @@ class EnhancedTable extends React.Component {
     };
 
     isSelected = id => this.state.selected.indexOf(id) !== -1;
-
+    handleClick_Activate  = event=> {
+        console.log("....:::::")
+        console.log(
+            this.state.selected
+        )
+    };
     render() {
         const { classes } = this.props;
         const { datas, order, orderBy, selected, rowsPerPage, page } = this.state;
@@ -304,7 +329,9 @@ class EnhancedTable extends React.Component {
 
         return (
             <Paper className={classes.root}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar
+                    numSelected={selected.length}
+                    func_save={this.handleClick_Activate}/>
                 <div className={classes.tableWrapper}>
                     <Table className={classes.table} aria-labelledby="tableTitle">
                         <EnhancedTableHead
@@ -331,14 +358,16 @@ class EnhancedTable extends React.Component {
                                             selected={isSelected}
                                         >
                                             <TableCell padding="checkbox">
+
                                                 <Checkbox checked={isSelected} />
+
                                             </TableCell>
                                             <TableCell component="th" scope="row" padding="none">
                                                 {n.name}
                                             </TableCell>
 
-                                            <TableCell numeric>{n.estado}</TableCell>
-
+                                            {/*<TableCell numeric>{n.estado}</TableCell>
+                                            */}
                                         </TableRow>
                                     );
                                 })}

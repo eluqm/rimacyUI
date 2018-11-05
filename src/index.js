@@ -16,6 +16,7 @@ import MultiSelectRimacy from './components/MultiSelectRimacy';
 import CobranzaRimacy from './components/CobranzaRimacy';
 import SwitchLabels from './components/SwitchLabels';
 import TablePagination from './components/TablePagination';
+import TablePedidos from './components/TablePedidos';
 function TabContainer(props) {
     return (
         <Typography component="div" style={{ padding: 8 * 3 }}>
@@ -39,8 +40,8 @@ var DATA = {
     name: 'John Doe',
     imgURL: 'https://loremflickr.com/320/240',
     followerList: ['Follower-1', 'Follower-2', 'Follower-3'],
-    host: 'http://174.138.48.60:8080/rimacy/',
-    //host:'http://localhost:8080/',
+    //host: 'http://174.138.48.60:8080/rimacy/',
+    host:'http://localhost:8080/',
 }
 
 class App extends Component{
@@ -68,6 +69,7 @@ class App extends Component{
                         <Tab label="Crear Zona" />
                         <Tab label="Asignar Ruta" />
                         <Tab label="Zonas" />
+                        <Tab label="Pedidos" />
                         {/*}  <Tab label="Item Three" />
                         <Tab label="Item Four" />
                         <Tab label="Item Five" />
@@ -79,7 +81,7 @@ class App extends Component{
                     {/*ReactDOM.render(<MultiSelectRimacy/>, document.getElementById('multiRuta'));
                     */}
                     <MultiSelectRimacy hostdata={DATA}/>
-                    </TabContainer>}
+                </TabContainer>}
                 {value === 1 && <TabContainer>
                     {/*ReactDOM.render(, document.getElementById('cobranza'));</TabContainer>}
                     */}
@@ -89,6 +91,10 @@ class App extends Component{
                 }
                 {value === 2 && <TabContainer>
                     <TablePagination hostdata={DATA}/>
+                </TabContainer>
+                }
+                {value === 3 && <TabContainer>
+                    <TablePedidos hostdata={DATA}/>
                 </TabContainer>
                 }
                 {/* {value === 3 && <TabContainer>Item Four</TabContainer>}

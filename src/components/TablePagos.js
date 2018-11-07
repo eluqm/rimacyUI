@@ -62,44 +62,18 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-    { id: 'nroguia', numeric: false, disablePadding: true, label: 'Nro Guia' },
-    { id: 'cliente', numeric: true, disablePadding: false, label: 'Cliente' },
-    { id: 'direccion', numeric: true, disablePadding: false, label: 'Dirección' },
-    { id: 'fechaped', numeric: true, disablePadding: false, label: 'FechaPed' },
-    { id: 'fechaent', numeric: true, disablePadding: false, label: 'FechaEnt' },
-    { id: 'saldo', numeric: true, disablePadding: false, label: 'Saldo' },
-    { id: 'total', numeric: true, disablePadding: false, label: 'Total' },
+    { id: 'fechapago', numeric: false, disablePadding: false, label: 'Fecha de Pago' },
+    { id: 'empleado', numeric: false, disablePadding: false, label: 'Nombre Empleado' },
+    { id: 'guia', numeric: true, disablePadding: false, label: 'Nro Guia' },
+    { id: 'monto', numeric: true, disablePadding: false, label: 'Monto' },
+    //{ id: 'fechaent', numeric: true, disablePadding: false, label: 'FechaEnt' },
+    //{ id: 'saldo', numeric: true, disablePadding: false, label: 'Saldo' },
+    //{ id: 'total', numeric: true, disablePadding: false, label: 'Total' },
 ];
-class SimpleDialog extends React.Component {
-    handleClose = () => {
-        this.props.onClose();
-    };
 
-    handleListItemClick = value => {
-        this.props.onClose(value);
-    };
 
-    render() {
-        const {classes, onClose, selectedValue, label, ...other} = this.props;
 
-        return (
-            <Dialog onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
-                <DialogTitle id="simple-dialog-title">{label}</DialogTitle>
-                <div>
 
-                </div>
-            </Dialog>
-        );
-    }
-}
-
-SimpleDialog.propTypes = {
-    classes: PropTypes.object.isRequired,
-    onClose: PropTypes.func,
-    // selectedValue: PropTypes.string,
-};
-
-const SimpleDialogWrapped = withStyles(styles)(SimpleDialog);
 class EnhancedTableHead extends React.Component {
     createSortHandler = property => event => {
         this.props.onRequestSort(event, property);
@@ -264,18 +238,19 @@ class EnhancedTable extends React.Component {
         open_confirmation: false,
     };
     componentDidMount() {
-        fetch(this.props.hostdata.host+"v1/allpedidos")
+        fetch(this.props.hostdata.host+"v1/allpagos")
             .then((response) => {
                 return response.json();
             }).then(data => {
             console.log("get data :")
-                console.log(data.data)
+            console.log(data.data)
+            //[3238,1190648926000,5.0,38,5.0,5350,38,"GUTIERREZ","FREDY","2002"]
             this.setState({
-                datas:     data.data.map(tbldata=>{return {id:tbldata[0],nroguia:tbldata[6],cliente:tbldata[14],direccion:tbldata[15],
-                    fechaped:tbldata[2],fechaent:tbldata[3], saldo:tbldata[5],total:tbldata[8]}}),
-            //selected:  data.data.map(tbldata1=>{return (parseInt(tbldata1[2])==1) && parseInt(tbldata1[0])
+                datas:     data.data.map(tbldata=>{return {id:tbldata[0],fechapago:tbldata[1],empleado:tbldata[7]+" "+tbldata[8],guia:tbldata[9],
+                    monto:tbldata[2]}}),
+                //selected:  data.data.map(tbldata1=>{return (parseInt(tbldata1[2])==1) && parseInt(tbldata1[0])
 
-               // }),
+                // }),
 
             })
 
@@ -323,7 +298,7 @@ class EnhancedTable extends React.Component {
         console.log("entre for all checked false:"+this.state.selected)
     };
 
-    handleClick = (event, id,saldo) => {
+    handleClick = (event, id) => {
         //console.log(this.state.selected);
         let newSelected = [];
         const { selected } = this.state;
@@ -362,9 +337,9 @@ class EnhancedTable extends React.Component {
         }
 
 
-        this.setState({currentSaldoInput:saldo});
+        //this.setState({currentSaldoInput:saldo});
         this.setState({ selected: newSelected });
-        this.setState({currentDifferenceInput:saldo});
+        //this.setState({currentDifferenceInput:saldo});
     };
 
     handleChangePage = (event, page) => {
@@ -438,8 +413,8 @@ class EnhancedTable extends React.Component {
             [commnent[0]]:(a-b).toFixed(2),
 
         });
-       // let a=(this.state.currentSaldoInput);
-       // let b=(this.state.currentPagoInput);
+        // let a=(this.state.currentSaldoInput);
+        // let b=(this.state.currentPagoInput);
         console.log(a)
         console.log(b)
         //this.setState({currentDifferenceInput: a-b })
@@ -451,165 +426,95 @@ class EnhancedTable extends React.Component {
 
         return (
             <div>
-            <Paper className={classes.root}>
-                <EnhancedTableToolbar
-                    numSelected={selected.length}
-                    func_save={this.handleClick_Activate}/>
-                <div className={classes.tableWrapper}>
-                    <Table className={classes.table} aria-labelledby="tableTitle">
-                        <EnhancedTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={this.handleSelectAllClick}
-                            onRequestSort={this.handleRequestSort}
-                            rowCount={datas.length}
-                        />
-                        <TableBody>
-                            {stableSort(datas, getSorting(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map(n => {
-                                    const isSelected = this.isSelected(n.id);
-                                    return (
-                                        <TableRow
-                                            hover
-
-                                            role="checkbox"
-                                            aria-checked={isSelected}
-                                            tabIndex={-1}
-                                            key={n.id}
-                                            selected={isSelected}
-                                        >
-                                            <TableCell padding="checkbox">
-                                                <Checkbox checked={isSelected} onClick={event => this.handleClick(event, n.id,n.saldo)} />
-
-                                            </TableCell>
-                                            <TableCell component="th" scope="row" padding="none">
-                                                {n.nroguia}
-
-                                            </TableCell>
-
-                                            <TableCell numeric>{n.cliente}</TableCell>
-                                            <TableCell numeric>{n.direccion}</TableCell>
-                                            <TableCell numeric>
-                                                {new Intl.DateTimeFormat('es-GB', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: '2-digit'
-                                            }).format(n.fechaped)}
-                                            </TableCell>
-                                            <TableCell numeric>
-                                                {new Intl.DateTimeFormat('es-GB', {
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: '2-digit'
-                                                }).format(n.fechaent)}
-                                            </TableCell>
-                                            <TableCell numeric>{n.saldo}</TableCell>
-                                            <TableCell numeric>{n.total}</TableCell>
-                                        </TableRow>
-                                    );
-                                })}
-                            {emptyRows > 0 && (
-                                <TableRow style={{ height: 49 * emptyRows }}>
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-
-                        <Dialog
-                            open={this.state.open}
-                            TransitionComponent={Transition}
-                            keepMounted
-                            onClose={this.handleClose}
-                            aria-labelledby="alert-dialog-slide-title"
-                            aria-describedby="alert-dialog-slide-description"
-                        >
-                            <DialogTitle id="alert-dialog-slide-title">
-                                {"seguro?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-slide-description">
-                                    actualizar....?
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={this.handleCloseDialog} color="primary">
-                                    Disagree
-                                </Button>
-                                <Button onClick={this.handleCloseDialogConfirm} color="primary">
-                                    Agree
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
-                        <SimpleDialogWrapped
-                            //selectedValue={this.state.selectedValue}
-                            label={"LLenar todos los campos!!!!!!"}
-                            open={this.state.open_validation}
-                            onClose={this.handleClose_Validation}
-                        />
-                        <SimpleDialogWrapped
-                            //selectedValue={this.state.selectedValue}
-                            label={"Se a actualizado!!!!!!"}
-                            open={this.state.open_confirmation}
-                            onClose={this.handleClose_Confirmation}
-                        />
-
-
-
-
-
-                    </Table>
-                </div>
-                <TablePagination
-                    component="div"
-                    count={datas.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    backIconButtonProps={{
-                        'aria-label': 'Previous Page',
-                    }}
-                    nextIconButtonProps={{
-                        'aria-label': 'Next Page',
-                    }}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
-                />
-            </Paper >
-
-
                 <Paper className={classes.root}>
-                    <TextField
-                        id="outlined-name"
-                        label="Saldo Actual"
-                        className={classes.textField}
-                        value={this.state.currentSaldoInput}
-                       // onChange={this.handleChangeInput('currentSaldoInput')}
-                        margin="normal"
-                        disabled
-                        variant="outlined"
+                    <EnhancedTableToolbar
+                        numSelected={selected.length}
+                        func_save={this.handleClick_Activate}/>
+                    <div className={classes.tableWrapper}>
+                        <Table className={classes.table} aria-labelledby="tableTitle">
+                            <EnhancedTableHead
+                                numSelected={selected.length}
+                                order={order}
+                                orderBy={orderBy}
+                                onSelectAllClick={this.handleSelectAllClick}
+                                onRequestSort={this.handleRequestSort}
+                                rowCount={datas.length}
+                            />
+                            <TableBody>
+                                {stableSort(datas, getSorting(order, orderBy))
+                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                    .map(n => {
+                                        const isSelected = this.isSelected(n.id);
+                                        return (
+                                            <TableRow
+                                                hover
+
+                                                role="checkbox"
+                                                aria-checked={isSelected}
+                                                tabIndex={-1}
+                                                key={n.id}
+                                                selected={isSelected}
+                                            >
+                                                <TableCell padding="checkbox">
+                                                    <Checkbox checked={isSelected} onClick={event => this.handleClick(event, n.id,n.saldo)} />
+
+                                                </TableCell>
+                                                <TableCell numeric component="th" scope="row" padding="none">
+
+                                                    {new Intl.DateTimeFormat('es-GB', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: '2-digit'
+                                                    }).format(n.fechapago)}
+
+                                                </TableCell>
+
+
+
+                                                <TableCell numeric >{n.empleado}</TableCell>
+                                                <TableCell numeric>{n.guia}
+
+                                                </TableCell>
+
+                                                <TableCell numeric>{n.monto}</TableCell>
+
+                                            </TableRow>
+                                        );
+                                    })}
+                                {emptyRows > 0 && (
+                                    <TableRow style={{ height: 49 * emptyRows }}>
+                                        <TableCell colSpan={6} />
+                                    </TableRow>
+                                )}
+                            </TableBody>
+
+
+
+
+
+
+
+
+                        </Table>
+                    </div>
+                    <TablePagination
+                        component="div"
+                        count={datas.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        backIconButtonProps={{
+                            'aria-label': 'Previous Page',
+                        }}
+                        nextIconButtonProps={{
+                            'aria-label': 'Next Page',
+                        }}
+                        onChangePage={this.handleChangePage}
+                        onChangeRowsPerPage={this.handleChangeRowsPerPage}
                     />
-                    <TextField
-                        id="outlined-name"
-                        label="Pago"
-                        className={classes.textField}
-                        value={this.state.currentPagoInput}
-                        //={this.handleChangePagoInput}
-                        onChange={this.handleChangePagoInput(['currentDifferenceInput','currentPagoInput'])}
-                        margin="normal"
-                        variant="outlined"
-                    />
-                    <TextField
-                        id="outlined-name"
-                        label="Nuevo Saldo"
-                        className={classes.textField}
-                        value={this.state.currentDifferenceInput}
-                        //onChange={this.handleChangePagoInput('currentDifferenceInput')}
-                        disabled
-                        margin="normal"
-                        variant="outlined"
-                    />
-                </Paper>
+                </Paper >
+
+
+
             </div>
 
 

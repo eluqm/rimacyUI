@@ -17,6 +17,7 @@ import CobranzaRimacy from './components/CobranzaRimacy';
 import SwitchLabels from './components/SwitchLabels';
 import TablePagination from './components/TablePagination';
 import TablePedidos from './components/TablePedidos';
+import TablePagos from './components/TablePagos';
 function TabContainer(props) {
     return (
         <Typography component="div" style={{ padding: 8 * 3 }}>
@@ -70,6 +71,8 @@ class App extends Component{
                         <Tab label="Asignar Ruta" />
                         <Tab label="Zonas" />
                         <Tab label="Pedidos" />
+                        <Tab label="Pagos" />
+
                         {/*}  <Tab label="Item Three" />
                         <Tab label="Item Four" />
                         <Tab label="Item Five" />
@@ -97,8 +100,11 @@ class App extends Component{
                     <TablePedidos hostdata={DATA}/>
                 </TabContainer>
                 }
-                {/* {value === 3 && <TabContainer>Item Four</TabContainer>}
-                {value === 4 && <TabContainer>Item Five</TabContainer>}
+                 {value === 4 && <TabContainer>
+                     <TablePagos hostdata={DATA}/>
+                 </TabContainer>}
+                {/*
+                 {value === 4 && <TabContainer>Item Five</TabContainer>}
                 {value === 5 && <TabContainer>Item Six</TabContainer>}
                 {value === 6 && <TabContainer>Item Seven</TabContainer>}*/}
             </div>

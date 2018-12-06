@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiepad.models.CobranzaAdapter;
+import com.aiepad.models.CobranzaModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -22,11 +25,11 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.aiepad.myapplication.R.id.map;
-
 public class DisplayMessageActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener {
     //private MapController myMapController;
@@ -55,7 +58,12 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     private static final List<PatternItem> PATTERN_POLYGON_BETA =
             Arrays.asList(DOT, GAP, DASH, GAP);
 
-    protected MapView mMapView;
+    ArrayList<CobranzaModel> dataModels;
+    ListView listview;
+    private static CobranzaAdapter adapter;
+    MapView mMapView;
+
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
 
     @Override
@@ -71,12 +79,30 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         // Capture the layout's TextView and set the string as its text
         TextView textView = findViewById(R.id.textView);
         textView.setText(message);
+        // List view
+        listview=(ListView)findViewById(R.id.list_v);
+        dataModels= new ArrayList<>();
 
+        dataModels.add(new CobranzaModel("Apple Pie", "Android 1.0", "1","September 23, 2008"));
+        dataModels.add(new CobranzaModel("Banana Bread", "Android 1.1", "2","February 9, 2009"));
+        dataModels.add(new CobranzaModel("Cupcake", "Android 1.5", "3","April 27, 2009"));
+        dataModels.add(new CobranzaModel("Donut","Android 1.6","4","September 15, 2009"));
+        dataModels.add(new CobranzaModel("Eclair", "Android 2.0", "5","October 26, 2009"));
+        dataModels.add(new CobranzaModel("Froyo", "Android 2.2", "8","May 20, 2010"));
+        dataModels.add(new CobranzaModel("Gingerbread", "Android 2.3", "9","December 6, 2010"));
+        dataModels.add(new CobranzaModel("Honeycomb","Android 3.0","11","February 22, 2011"));
+
+        adapter= new CobranzaAdapter(dataModels,DisplayMessageActivity.this);
+        listview.setAdapter(adapter);
        // SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
         //        .findFragmentById(R.id.map);
         //mapFragment.getMapAsync(this);
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
+        }
         mMapView= findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
+        mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
         //mapView.getMapAsync(this);
 
@@ -136,9 +162,13 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mMapView != null) {
-            mMapView.onSaveInstanceState(outState);
+        Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
+        if (mapViewBundle == null) {
+            mapViewBundle = new Bundle();
+            outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
         }
+        mMapView.onSaveInstanceState(mapViewBundle);
+
     }
 
     @Override

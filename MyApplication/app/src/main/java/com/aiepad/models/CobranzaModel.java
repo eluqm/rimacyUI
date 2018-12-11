@@ -1,9 +1,21 @@
 package com.aiepad.models;
 
 
-public class CobranzaModel {
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.SerializedName;
 
-    String name;
+import java.util.Date;
+import java.util.List;
+
+public class CobranzaModel {
+    @SerializedName("1")
+    String name; //empleado
+    String id_name;
+    String name_zona; // nombre zona
+    String id_zona;
+    Integer dias;
+    Date fecha_init;
+    List<LatLng> coordinates ;
     String type;
     String version_number;
     String feature;

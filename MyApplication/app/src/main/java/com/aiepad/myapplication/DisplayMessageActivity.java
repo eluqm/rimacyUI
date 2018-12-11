@@ -1,25 +1,33 @@
 package com.aiepad.myapplication;
 
 import android.content.Intent;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aiepad.connection.GsonRequest;
 import com.aiepad.models.CobranzaAdapter;
 import com.aiepad.models.CobranzaModel;
+import com.aiepad.models.Example;
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
@@ -28,8 +36,8 @@ import com.google.android.gms.maps.model.Polyline;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import com.aiepad.connection.GetDataWeb;
 
-import static com.aiepad.myapplication.R.id.map;
 public class DisplayMessageActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener {
     //private MapController myMapController;
@@ -62,6 +70,8 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     ListView listview;
     private static CobranzaAdapter adapter;
     MapView mMapView;
+    List<Polygon> polygons = new ArrayList<Polygon>();
+    GetDataWeb getdata= new GetDataWeb();
 
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
@@ -79,6 +89,37 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         // Capture the layout's TextView and set the string as its text
         TextView textView = findViewById(R.id.textView);
         textView.setText(message);
+        //getdata.getGETMETHOD(this,textView);
+
+
+        GsonRequest<Example> jsonObjReq = new GsonRequest<Example>("http://174.138.48.60:8080/rimacy/v1/getcoorbyture/68",
+                Example.class, null, new Listener<Example>() {
+            @Override
+            public void onResponse(Example response) {
+                System.out.print("edson==="+response.getData());
+                System.out.print("edson==="+response);
+            }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("edson===ERROR");
+                System.out.print(error);
+            }
+        }
+
+
+            );
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(jsonObjReq);
+
+
+
+
+
+
+
+
         // List view
         listview=(ListView)findViewById(R.id.list_v);
         dataModels= new ArrayList<>();
@@ -92,8 +133,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         dataModels.add(new CobranzaModel("Gingerbread", "Android 2.3", "9","December 6, 2010"));
         dataModels.add(new CobranzaModel("Honeycomb","Android 3.0","11","February 22, 2011"));
 
-        adapter= new CobranzaAdapter(dataModels,DisplayMessageActivity.this);
-        listview.setAdapter(adapter);
+
        // SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
         //        .findFragmentById(R.id.map);
         //mapFragment.getMapAsync(this);
@@ -104,6 +144,9 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         mMapView= findViewById(R.id.mapView);
         mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
+
+
+
         //mapView.getMapAsync(this);
 
         //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -172,10 +215,22 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
 
         System.out.print("ESTOY POR ACA ");
-        Polygon polygon2 = googleMap.addPolygon(new PolygonOptions()
+        fillPolygonsbyUser(googleMap);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-31.673, 128.892),15));
+        // Set listeners for click events.
+
+        googleMap.setOnPolylineClickListener(this);
+        googleMap.setOnPolygonClickListener(this);
+        //list view of Cobranza
+
+        adapter= new CobranzaAdapter(dataModels,DisplayMessageActivity.this,mMapView);
+        listview.setAdapter(adapter);
+
+
+       /* Polygon polygon2 = googleMap.addPolygon(new PolygonOptions()
                 .clickable(true)
                 .add(
                         new LatLng(-31.673, 128.892),
@@ -194,7 +249,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
                         new LatLng(-16.39661656200106,-71.52613006535457)
                 ));
         polygon3.setTag("beta");
-        stylePolygon(polygon3);
+        stylePolygon(polygon3);*/
 
 
         //stylePolygon(polygon3);
@@ -203,10 +258,19 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         // and set the zoom factor so most of Australia shows on the screen.
         // googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-23.684, 133.903), 4));-16.4032871,-71.5356009
         //-16.4032871,-71.5356009
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-16.4032871,-71.5256009),15));
-        // Set listeners for click events.
-       // googleMap.setOnPolylineClickListener(this);
-       // googleMap.setOnPolygonClickListener(this);
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                CobranzaModel dataModel= dataModels.get(position);
+                System.out.print("entre item : "+ dataModel.getName());
+                googleMap.clear();
+                fillPolygonsbyUser2(googleMap);
+                deletePolygonsbyUser(0);
+                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-16.4032871,-71.5256009),15));
+
+            }
+        });
 
     }
 
@@ -268,5 +332,73 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         polygon.setStrokeWidth(POLYGON_STROKE_WIDTH_PX);
         polygon.setStrokeColor(strokeColor);
         polygon.setFillColor(fillColor);
+    }
+
+    public List<Polygon> getPolygonsbyUser()
+    {
+
+        return polygons;
+    }
+
+    public void fillPolygonsbyUser(GoogleMap googleMap)
+    {
+        List<LatLng> coord= new ArrayList<>();
+        coord.add(new LatLng(-31.673, 128.892));
+        coord.add(
+                new LatLng(-31.952, 115.857));
+        coord.add(
+                new LatLng(-17.785, 122.258));
+        coord.add(
+                new LatLng(-12.4258, 130.7932));
+        polygons.add(googleMap.addPolygon(new PolygonOptions().clickable(true).addAll(coord
+                )));
+        polygons.get(polygons.size()-1).setTag("beta");
+        stylePolygon(polygons.get(polygons.size()-1));
+
+
+
+
+    polygons.add(googleMap.addPolygon(new PolygonOptions()
+                .clickable(true)
+                .add(
+                        new LatLng(-16.39804214879857,-71.52398039928043),
+                        new LatLng(-16.38963454630951,-71.52677869390607),
+                        new LatLng(-16.39661656200106,-71.52613006535457)
+                )));
+        polygons.get(polygons.size()-1).setTag("alpha");
+        stylePolygon(polygons.get(polygons.size()-1));
+
+    }
+    public void fillPolygonsbyUser2(GoogleMap googleMap)
+    {
+        polygons.add(googleMap.addPolygon(new PolygonOptions().clickable(true).add(
+                new LatLng(-31.673, 128.892),
+                new LatLng(-31.952, 115.857),
+                new LatLng(-12.4258, 130.7932))));
+        polygons.get(polygons.size()-1).setTag("alpha");
+        stylePolygon(polygons.get(polygons.size()-1));
+
+
+
+
+        polygons.add(googleMap.addPolygon(new PolygonOptions()
+                .clickable(true)
+                .add(
+                        new LatLng(-16.39804214879857,-71.52398039928043),
+                        new LatLng(-16.38963454630951,-71.52677869390607),
+                        new LatLng(-16.39661656200106,-71.52613006535457)
+                )));
+        polygons.get(polygons.size()-1).setTag("alpha");
+        stylePolygon(polygons.get(polygons.size()-1));
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-16.4032871,-71.5256009),15));
+
+    }
+    public void deletePolygonsbyUser(Integer index)
+    {
+
+        polygons.remove(index);
+
+
     }
 }

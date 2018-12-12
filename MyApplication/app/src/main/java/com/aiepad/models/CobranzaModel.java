@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 public class CobranzaModel {
-    @SerializedName("1")
+
     String name; //empleado
     String id_name;
     String name_zona; // nombre zona

@@ -97,7 +97,9 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
             @Override
             public void onResponse(Example response) {
                 System.out.print("edson==="+response.getData());
-                System.out.print("edson==="+response);
+                System.out.print("edson==="+response.getMessage());
+                System.out.print("edson==="+response.getSuccess());
+
             }
         }, new ErrorListener() {
             @Override

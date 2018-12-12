@@ -6,29 +6,29 @@ public class Coordenadas {
 
 
     @SerializedName("0")
-    String id;
+    Number id;
     @SerializedName("1")
-    Long a;
+    Number a;
     @SerializedName("2")
     Long b;
     @SerializedName("3")
     Long c;
     @SerializedName("4")
-    Long d;
+    String d;
 
-    public String getId() {
+    public Number getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Number id) {
         this.id = id;
     }
 
-    public Long getA() {
+    public Number getA() {
         return a;
     }
 
-    public void setA(Long a) {
+    public void setA(Number a) {
         this.a = a;
     }
 
@@ -48,11 +48,11 @@ public class Coordenadas {
         this.c = c;
     }
 
-    public Long getD() {
+    public String getD() {
         return d;
     }
 
-    public void setD(Long d) {
+    public void setD(String d) {
         this.d = d;
     }
 }

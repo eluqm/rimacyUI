@@ -2,21 +2,23 @@ package com.aiepad.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Example {
 
     @SerializedName("data")
-    List<List<Coordenadas>> data=null;
+    List<List<Float>> data = new ArrayList<>();
 
     String success;
     String message;
 
-    public List<List<Coordenadas>> getData() {
+    public List<List<Float>> getData() {
         return data;
     }
 
-    public void setData(List<List<Coordenadas>> data) {
+    public void setData(List<List<Float>> data) {
         this.data = data;
     }
 

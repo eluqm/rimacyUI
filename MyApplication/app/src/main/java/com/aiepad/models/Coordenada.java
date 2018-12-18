@@ -5,20 +5,20 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cobranza{
+public class Coordenada {
 
-@SerializedName("data")
-ArrayList<CobranzaObject> data = new ArrayList<>();
+    @SerializedName("data")
+    List<List<String>> data = new ArrayList<>();
 
-String success;
+    String success;
 
-String message;
+    String message;
 
-    public ArrayList<CobranzaObject> getData() {
+    public List<List<String>> getData() {
         return data;
     }
 
-    public void setData(ArrayList<CobranzaObject> data) {
+    public void setData(List<List<String>> data) {
         this.data = data;
     }
 

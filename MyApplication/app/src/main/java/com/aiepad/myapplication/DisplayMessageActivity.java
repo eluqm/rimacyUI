@@ -79,7 +79,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     private static CobranzaAdapter adapter;
     private static CobranzaObjectAdapter adapter2;
     MapView mMapView;
-    List<String> coordenadas = new ArrayList<String>();
+    List<List<String>> coordenadas = new ArrayList<>();
     List<Polygon> polygons = new ArrayList<Polygon>();
     GetDataWeb getdata= new GetDataWeb();
     RequestQueue queue;
@@ -121,7 +121,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
 
 
 
-        GsonRequest<Example> jsonObjReq = new GsonRequest<Example>("http://174.138.48.60:8080/rimacy/v1/getcoorbyture/68",
+        /*GsonRequest<Example> jsonObjReq = new GsonRequest<Example>("http://174.138.48.60:8080/rimacy/v1/getcoorbyture/68",
                 Example.class, null, new Listener<Example>() {
             @Override
             public void onResponse(Example response) {
@@ -139,11 +139,11 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         }
 
 
-            );
+            );*/
 
         queue = Volley.newRequestQueue(this);
         queue.add(jsonObjCobranza);
-        queue.add(jsonObjReq);
+       // queue.add(jsonObjReq);
 
 
 
@@ -302,9 +302,11 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
                         Coordenada.class, null, new Listener<Coordenada>() {
                     @Override
                     public void onResponse(Coordenada response) {
-                        System.out.println("edsonCOORdenada"+response.getData());
-                        coordenadas=response.getData();
-                        //System.out.println("cobranza id; "+ dataModel.get_idCobranza());
+                        System.out.println("RUTAS"+dataModel.get_rutas());
+                        coordenadas.clear();
+                        coordenadas.addAll(response.getData());
+
+                        //System.out.println("cobranza id; "+ dataMode.get_idCobranza());
                         //System.out.print("edson==="+response.getMessage());
                         //System.out.print("edson==="+response.getSuccess());
 
@@ -325,12 +327,18 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
                 queue.add(jsonObjReq);
                 System.out.print("entre item : "+ dataModel.get_name());
                 System.out.println("COORDENADA DATA");
-               System.out.println(coordenadas.size());
-                // System.out.println(coordenadas.get(0));
+                for(List<String> str:coordenadas){
+                    for (String st2:str){
+
+                        System.out.println(st2);
+                    }
+
+                }
+                //System.out.println(coordenadas);
                // System.out.println(coordenadas.get(1));
                // System.out.println(coordenadas.get(2));
                 googleMap.clear();
-                //fillPolygonsbyUser2(googleMap,coordenadas);
+               // fillPolygonsbyUser2(googleMap,coordenadas);
                 deletePolygonsbyUser(0);
                 //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-16.4032871,-71.5256009),15));
 
@@ -434,21 +442,33 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         stylePolygon(polygons.get(polygons.size()-1));
 
     }
-    public void fillPolygonsbyUser2(GoogleMap googleMap,List<String> coord)
+    public void fillPolygonsbyUser2(GoogleMap googleMap,List<List<String>> coord)
     {
 
         //List<String> idscoor= new ArrayList<String>();
-        String[] idcoor=coord.get(0).split(",");
-        String[] lat=coord.get(1).split(",");
-        String[] lon=coord.get(2).split(",");
-        System.out.println("entre aca  COORDENADAS"+idcoor);
-        System.out.println(lat);
-        List<LatLng> latcoor = new ArrayList<>();
+        //String[] idcoor=coord.get(0).split(",");
+        //String[] lat=coord.get(1).split(",");
+        //String[] lon=coord.get(2).split(",");
+        System.out.println("LISTA DENTRO 1");
+        List<List<String>> coords= new ArrayList<>();
+        for(List<String> str:coord)
+        {
+            for(String str2:str)
+            {
+                System.out.println("LISTA DENTRO 2");
+                System.out.println(str2);
+                coords.add(Arrays.asList(str2.split(",")));
+            }
+        }
+
+        //System.out.println("entre aca  COORDENADAS"+idcoor);
+        //System.out.println(lat);
+        //List<LatLng> latcoor = new ArrayList<>();
         Integer count=0;
         PolygonOptions opts=new PolygonOptions();
-        for(String str: idcoor)
+        for(String str: coords.get(1))
         {
-            opts.add(new LatLng(Long.parseLong(lat[count]),Long.parseLong(lon[count])));
+            opts.add(new LatLng(Long.parseLong(coords.get(2).get(count)),Long.parseLong(coords.get(3).get(count))));
             count++;
 
         }

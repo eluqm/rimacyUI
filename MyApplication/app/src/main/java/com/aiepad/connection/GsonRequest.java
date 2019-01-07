@@ -1,5 +1,8 @@
 package com.aiepad.connection;
 
+import android.os.AsyncTask;
+
+import com.android.volley.toolbox.RequestFuture;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -7,24 +10,27 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
+
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-public class GsonRequest<T> extends Request<T> {
+public class GsonRequest<T> extends Request<T>{
 
     private final Gson gson = new Gson();
     private final Class<T> clazz;
     private final Map<String, String> headers;
     private final Response.Listener<T> listener;
-
+    //private final RequestFuture<JSONObject> future = RequestFuture.newFuture();
     /**
      * Make a GET request and return a parsed object from JSON.
      *  @param url URL of the request to make
@@ -33,6 +39,7 @@ public class GsonRequest<T> extends Request<T> {
      */
     public GsonRequest(String url, Class<T> clazz, Map<String, String> headers,
                        Listener<T> listener, ErrorListener errorListener) {
+        //RequestFuture<JSONObject> future = RequestFuture.newFuture();
         super(Method.GET, url, errorListener);
         this.clazz = clazz;
         this.headers = headers;
@@ -50,7 +57,10 @@ public class GsonRequest<T> extends Request<T> {
         listener.onResponse(response);
     }
 
-
+    @Override
+    public Priority getPriority() {
+        return Priority.IMMEDIATE;
+    }
 
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
@@ -62,14 +72,9 @@ public class GsonRequest<T> extends Request<T> {
             System.out.print("si hay respuesta valida= "+ json);
             T result;
 
-                System.out.print("NO-LISTA");
+
                 result = gson.fromJson(json, clazz);
 
-
-
-
-                //Type clazzListType = new TypeToken<List<T>>() {}.getType();
-                //result = gson.fromJson(json, clazzListType);
 
             return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {

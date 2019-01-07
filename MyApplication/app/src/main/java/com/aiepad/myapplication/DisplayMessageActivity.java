@@ -18,11 +18,14 @@ import com.aiepad.models.CobranzaObjectAdapter;
 import com.aiepad.models.Coordenada;
 import com.aiepad.models.Example;
 import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -41,12 +44,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import com.aiepad.connection.GetDataWeb;
+import com.aiepad.connection.VoleyCallback;
 import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static java.lang.Integer.parseInt;
 
 public class DisplayMessageActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnPolylineClickListener,
         GoogleMap.OnPolygonClickListener {
+
     //private MapController myMapController;
     private static final int COLOR_BLACK_ARGB = 0xff000000;
     private static final int COLOR_WHITE_ARGB = 0xffffffff;
@@ -79,8 +88,10 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     private static CobranzaAdapter adapter;
     private static CobranzaObjectAdapter adapter2;
     MapView mMapView;
+    String message;
     List<List<String>> coordenadas = new ArrayList<>();
     List<Polygon> polygons = new ArrayList<Polygon>();
+    Polygon polybeta;
     GetDataWeb getdata= new GetDataWeb();
     RequestQueue queue;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -94,55 +105,15 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+         message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        System.out.println(message+":ESTE ES EL MENSAJE QUE SE PASA ");
 
         // Capture the layout's TextView and set the string as its text
-        TextView textView = findViewById(R.id.textView);
-        textView.setText(message);
+        //TextView textView = findViewById(R.id.textView);
+        //textView.setText(message);
         //getdata.getGETMETHOD(this,textView);
         //Integer idBeta= parseInt(message);
 
-        GsonRequest<Cobranza> jsonObjCobranza = new GsonRequest<>("http://174.138.48.60:8080/rimacy/v1/getcobranzasbyempl/" + message,
-                Cobranza.class, null, new Listener<Cobranza>() {
-            @Override
-            public void onResponse(Cobranza response) {
-                System.out.print("edsonNueva data"+response.getData());
-
-                dataModels2=response.getData();
-
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.println("edson===ERROR2");
-                System.out.print(error);
-            }
-        });
-
-
-
-        /*GsonRequest<Example> jsonObjReq = new GsonRequest<Example>("http://174.138.48.60:8080/rimacy/v1/getcoorbyture/68",
-                Example.class, null, new Listener<Example>() {
-            @Override
-            public void onResponse(Example response) {
-                System.out.print("edson==="+response.getData());
-                System.out.print("edson==="+response.getMessage());
-                System.out.print("edson==="+response.getSuccess());
-
-            }
-        }, new ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.println("edson===ERROR");
-                System.out.print(error);
-            }
-        }
-
-
-            );*/
-
-        queue = Volley.newRequestQueue(this);
-        queue.add(jsonObjCobranza);
        // queue.add(jsonObjReq);
 
 
@@ -249,101 +220,69 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     @Override
     public void onMapReady(final GoogleMap googleMap) {
 
-        System.out.print("ESTOY POR ACA ");
-        fillPolygonsbyUser(googleMap);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-31.673, 128.892),15));
-        // Set listeners for click events.
-
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnPolygonClickListener(this);
-        //list view of Cobranza
 
-        //adapter= new CobranzaAdapter(dataModels,DisplayMessageActivity.this,mMapView);
-
-        adapter2= new CobranzaObjectAdapter(dataModels2,DisplayMessageActivity.this,mMapView);
-        listview.setAdapter(adapter2);
-        //listview.setAdapter(adapter);
-
-        /* Polygon polygon2 = googleMap.addPolygon(new PolygonOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-31.673, 128.892),
-                        new LatLng(-31.952, 115.857),
-                        new LatLng(-17.785, 122.258),
-                        new LatLng(-12.4258, 130.7932)));
-        polygon2.setTag("beta");
-        stylePolygon(polygon2);
-
-
-        Polygon polygon3 = googleMap.addPolygon(new PolygonOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-16.39804214879857,-71.52398039928043),
-                        new LatLng(-16.38963454630951,-71.52677869390607),
-                        new LatLng(-16.39661656200106,-71.52613006535457)
-                ));
-        polygon3.setTag("beta");
-        stylePolygon(polygon3);*/
-
-
-        //stylePolygon(polygon3);
-
-        // Position the map's camera near Alice Springs in the center of Australia,
-        // and set the zoom factor so most of Australia shows on the screen.
-        // googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-23.684, 133.903), 4));-16.4032871,-71.5356009
-        //-16.4032871,-71.5356009
-
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        GsonRequest<Cobranza> jsonObjCobranza = new GsonRequest<>("http://174.138.48.60:8080/rimacy/v1/getcobranzasbyempl/" + message,
+                Cobranza.class, null, new Listener<Cobranza>() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final CobranzaObject dataModel= dataModels2.get(position);
+            public void onResponse(Cobranza response) {
 
-                GsonRequest<Coordenada> jsonObjReq = new GsonRequest<Coordenada>("http://174.138.48.60:8080/rimacy/v1/getcoorbyrutename/"+dataModel.get_rutas(),
-                        Coordenada.class, null, new Listener<Coordenada>() {
+                dataModels2 = response.getData();
+
+                fillPolygonsbyUser(googleMap);
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-31.673, 128.892),15));
+
+                //list view of Cobranza
+
+                adapter2= new CobranzaObjectAdapter(dataModels2,DisplayMessageActivity.this,mMapView);
+                listview.setAdapter(adapter2);
+
+                listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onResponse(Coordenada response) {
-                        System.out.println("RUTAS"+dataModel.get_rutas());
-                        coordenadas.clear();
-                        coordenadas.addAll(response.getData());
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final CobranzaObject dataModel= dataModels2.get(position);
+                        String url="http://174.138.48.60:8080/rimacy/v1/getcoorbyrutename/"+dataModel.get_rutas();
 
-                        //System.out.println("cobranza id; "+ dataMode.get_idCobranza());
-                        //System.out.print("edson==="+response.getMessage());
-                        //System.out.print("edson==="+response.getSuccess());
+                        queue.add(getMarkers(new VoleyCallback() {
+                            @Override
+                            public void onSuccess() {
+                                System.out.println(coordenadas);
+                            }
+                        }, url));
+
+                        for(List<String> str:coordenadas){
+                            for (String st2:str){
+
+                                System.out.println(st2);
+                            }
+
+                        }
+
+                        googleMap.clear();
+                        fillPolygonsbyUser2(googleMap,coordenadas);
+                        deletePolygonsbyUser(0);
+
 
                     }
-                }, new ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println("edson===ERROR");
-                        System.out.print(error);
-                    }
-                }
-
-
-                );
-
-                //queue = Volley.newRequestQueue(this);
-
-                queue.add(jsonObjReq);
-                System.out.print("entre item : "+ dataModel.get_name());
-                System.out.println("COORDENADA DATA");
-                for(List<String> str:coordenadas){
-                    for (String st2:str){
-
-                        System.out.println(st2);
-                    }
-
-                }
-                //System.out.println(coordenadas);
-               // System.out.println(coordenadas.get(1));
-               // System.out.println(coordenadas.get(2));
-                googleMap.clear();
-               // fillPolygonsbyUser2(googleMap,coordenadas);
-                deletePolygonsbyUser(0);
-                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-16.4032871,-71.5256009),15));
+                });
 
             }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                System.out.print(error);
+            }
         });
+
+
+
+        queue = Volley.newRequestQueue(this);
+        queue.add(jsonObjCobranza);
+
+
+
 
     }
 
@@ -373,6 +312,8 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
                 Toast.LENGTH_SHORT).show();
 
     }
+
+
 
     private void stylePolygon(Polygon polygon) {
         String type = "";
@@ -444,12 +385,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     }
     public void fillPolygonsbyUser2(GoogleMap googleMap,List<List<String>> coord)
     {
-
-        //List<String> idscoor= new ArrayList<String>();
-        //String[] idcoor=coord.get(0).split(",");
-        //String[] lat=coord.get(1).split(",");
-        //String[] lon=coord.get(2).split(",");
-        System.out.println("LISTA DENTRO 1");
+        if(coord.isEmpty()){return;}
         List<List<String>> coords= new ArrayList<>();
         for(List<String> str:coord)
         {
@@ -460,7 +396,14 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
                 coords.add(Arrays.asList(str2.split(",")));
             }
         }
-
+        //List<Double> lat_double=new ArrayList<>();
+        //List<Double> lat_d=new ArrayList<>();
+        Double lat=0.0;
+        Double lon=0.0;
+        System.out.println("Pase listas");
+        System.out.println(coords.get(1).size());
+        System.out.println(coords.get(2).size());
+        System.out.println(coords.get(3).size());
         //System.out.println("entre aca  COORDENADAS"+idcoor);
         //System.out.println(lat);
         //List<LatLng> latcoor = new ArrayList<>();
@@ -468,15 +411,23 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         PolygonOptions opts=new PolygonOptions();
         for(String str: coords.get(1))
         {
-            opts.add(new LatLng(Long.parseLong(coords.get(2).get(count)),Long.parseLong(coords.get(3).get(count))));
+
+            // to set moveCamera focus mean
+            lat+=Double.parseDouble(coords.get(2).get(count));
+            lon+=Double.parseDouble(coords.get(3).get(count));
+
+            //creating list of coordinates
+            opts.add(new LatLng(Double.parseDouble(coords.get(2).get(count)),Double.parseDouble(coords.get(3).get(count))));
+
             count++;
 
         }
-        polygons.add(googleMap.addPolygon(opts.clickable(true)
-
-        ));
+        polybeta = googleMap.addPolygon(opts.clickable(true));
+        //polybeta=add(googleMap.addPolygon(opts.clickable(true)));
+        polybeta.setTag("beta");
+        //polygons.get(0).setTag("beta");
         //polygons.get(polygons.size()-1).setTag("alpha");
-        stylePolygon(polygons.get(polygons.size()-1));
+        stylePolygon(polybeta);
 
 
 
@@ -491,7 +442,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         polygons.get(polygons.size()-1).setTag("alpha");
         stylePolygon(polygons.get(polygons.size()-1));*/
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-16.4032871,-71.5256009),15));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat/count,lon/count),13));
 
     }
     public void deletePolygonsbyUser(Integer index)
@@ -500,5 +451,68 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         polygons.remove(index);
 
 
+    }
+    public  GsonRequest getMarkers(final VoleyCallback callBack,String url){
+
+        //requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+
+        GsonRequest<Coordenada> jsonObjReq = new GsonRequest<Coordenada>(url,
+                Coordenada.class, null, new Listener<Coordenada>() {
+            @Override
+            public void onResponse(Coordenada response) {
+                //System.out.println("RUTAS"+dataModel.get_rutas());
+                coordenadas.clear();
+                coordenadas.addAll(response.getData());
+                callBack.onSuccess();
+                //System.out.println("cobranza id; "+ dataMode.get_idCobranza());
+                //System.out.print("edson==="+response.getMessage());
+                System.out.println("edson==="+coordenadas);
+
+            }
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("edson===ERROR");
+                System.out.print(error);
+            }});
+
+        return jsonObjReq;
+
+
+        //queue = Volley.newRequestQueue(this);
+
+
+        //queue.stop();
+        /*JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, new Response.Listener<JSONObject>() {
+
+
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+
+                    JSONArray saagTracker = response.getJSONArray("saagMRK");
+                    for (int i = 0; i < saagTracker.length(); i++) {
+                        JSONObject object = saagTracker.getJSONObject(i);
+
+
+                        callBack.onSuccess();
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                //JSONArray array = new JSONArray(response.body().string());
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Toast.makeText(MainActivity.this, "Ocurrio un error", Toast.LENGTH_LONG).show();
+            }
+        });*/
+       // requestQueue.add(jsonObjectRequest);
     }
 }

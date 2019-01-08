@@ -82,19 +82,21 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     private static final List<PatternItem> PATTERN_POLYGON_BETA =
             Arrays.asList(DOT, GAP, DASH, GAP);
 
-    ArrayList<CobranzaModel> dataModels;
-    ArrayList<CobranzaObject> dataModels2;
-    ListView listview;
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+
+    // utils vars in order to manages server response
     private static CobranzaAdapter adapter;
     private static CobranzaObjectAdapter adapter2;
-    MapView mMapView;
-    String message;
+    ArrayList<CobranzaModel> dataModels;
+    ArrayList<CobranzaObject> dataModels2;
     List<List<String>> coordenadas = new ArrayList<>();
     List<Polygon> polygons = new ArrayList<Polygon>();
+    ListView listview;
+    MapView mMapView;
+    String message;
     Polygon polybeta;
     GetDataWeb getdata= new GetDataWeb();
     RequestQueue queue;
-    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
 
     @Override
@@ -107,21 +109,6 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         Intent intent = getIntent();
          message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
         System.out.println(message+":ESTE ES EL MENSAJE QUE SE PASA ");
-
-        // Capture the layout's TextView and set the string as its text
-        //TextView textView = findViewById(R.id.textView);
-        //textView.setText(message);
-        //getdata.getGETMETHOD(this,textView);
-        //Integer idBeta= parseInt(message);
-
-       // queue.add(jsonObjReq);
-
-
-
-
-
-
-
 
         // List view
         listview=(ListView)findViewById(R.id.list_v);
@@ -147,25 +134,6 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         mMapView= findViewById(R.id.mapView);
         mMapView.onCreate(mapViewBundle);
         mMapView.getMapAsync(this);
-
-
-
-        //mapView.getMapAsync(this);
-
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-        //       .findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
-
-
-       // mapView.getMapAsync(this);
-        //mapView.onCreate(savedInstanceState);
-        //mapView.onCreate(savedInstanceState);
-       // myMapController = mapView.getController();
-       // mOverlays = mapView.getOverlays();
-       // mOverlayLocation = new MyLocationOverlay(this, mapView);
-
-
-
 
     }
 
@@ -429,19 +397,6 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         //polygons.get(polygons.size()-1).setTag("alpha");
         stylePolygon(polybeta);
 
-
-
-/*
-        polygons.add(googleMap.addPolygon(new PolygonOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(-16.39804214879857,-71.52398039928043),
-                        new LatLng(-16.38963454630951,-71.52677869390607),
-                        new LatLng(-16.39661656200106,-71.52613006535457)
-                )));
-        polygons.get(polygons.size()-1).setTag("alpha");
-        stylePolygon(polygons.get(polygons.size()-1));*/
-
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat/count,lon/count),13));
 
     }
@@ -479,40 +434,5 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
 
         return jsonObjReq;
 
-
-        //queue = Volley.newRequestQueue(this);
-
-
-        //queue.stop();
-        /*JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, new Response.Listener<JSONObject>() {
-
-
-            @Override
-            public void onResponse(JSONObject response) {
-
-                try {
-
-                    JSONArray saagTracker = response.getJSONArray("saagMRK");
-                    for (int i = 0; i < saagTracker.length(); i++) {
-                        JSONObject object = saagTracker.getJSONObject(i);
-
-
-                        callBack.onSuccess();
-
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                //JSONArray array = new JSONArray(response.body().string());
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //Toast.makeText(MainActivity.this, "Ocurrio un error", Toast.LENGTH_LONG).show();
-            }
-        });*/
-       // requestQueue.add(jsonObjectRequest);
     }
 }

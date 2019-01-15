@@ -9,24 +9,57 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.aiepad.connection.GetDataWeb;
+import com.aiepad.connection.GsonRequest;
+import com.aiepad.models.Cobranza;
+import com.aiepad.models.CobranzaObject;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.aiepad.myapplication.MESSAGE";
-
+    ArrayList<CobranzaObject> dataModels2;
+    RequestQueue queue;
+    GetDataWeb getwebdata= new GetDataWeb();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
     /** Called when the user taps the Send button */
-    public void sendMessage(View view) {
-        Intent intent = new Intent(this, DisplayMessageActivity.class);
+    public void sendMessage(final View view) {
+        final Intent intent = new Intent(this, DisplayMessageActivity.class);
         EditText editText = (EditText) findViewById(R.id.editText);
-        String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
+        final String message = editText.getText().toString();
 
+        GsonRequest<Cobranza> jsonObjCobranza = new GsonRequest<>(getwebdata.getHostname()+"getcobranzasbyempl_1/" + message,
+                Cobranza.class, null, new Response.Listener<Cobranza>() {
+            @Override
+            public void onResponse(Cobranza response) {
 
+                dataModels2=response.getData();
+                if(!dataModels2.isEmpty()){
+                    intent.putExtra(EXTRA_MESSAGE, message);
+                    startActivity(intent);
+                }else{
+                    callbackButton(view);
+                }
 
-        startActivity(intent);
+            }
+        },new Response.ErrorListener(){
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    System.out.print(error);
+                }
+            });
+
+        queue = Volley.newRequestQueue(this);
+        queue.add(jsonObjCobranza);
 
         /** Called when the user taps snackbutton */
         //Button button = (Button) findViewById(R.id.callbackButton);

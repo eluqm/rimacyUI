@@ -5,6 +5,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.widget.TextView;
 
+import com.aiepad.myapplication.R;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -18,7 +19,8 @@ public class GetDataWeb {
 // ...
 
     // Instantiate the RequestQueue.
-
+    String name_host="http://174.138.48.60:8080/rimacy/v1/";
+    //String name_host="http://192.168.0.13:8080/v1/";
     public RequestQueue getGETMETHOD(Context context, final TextView mTextView)
     {
         RequestQueue queue = Volley.newRequestQueue(context);
@@ -44,6 +46,11 @@ public class GetDataWeb {
 
         queue.add(stringRequest);
       return queue;
+    }
+    public String getHostname()
+    {
+        return name_host;
+
     }
 
 

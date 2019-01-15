@@ -2,57 +2,40 @@ package com.aiepad.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Coordenadas {
 
+    @SerializedName("data")
+    ArrayList<CoordenadasObject> data = new ArrayList<>();
 
-    @SerializedName("0")
-    Number id;
-    @SerializedName("1")
-    Number a;
-    @SerializedName("2")
-    Long b;
-    @SerializedName("3")
-    Long c;
-    @SerializedName("4")
-    String d;
+    String success;
 
-    public Number getId() {
-        return id;
+    String message;
+
+
+    public ArrayList<CoordenadasObject> getData() {
+        return data;
     }
 
-    public void setId(Number id) {
-        this.id = id;
+    public void setData(ArrayList<CoordenadasObject> data) {
+        this.data = data;
     }
 
-    public Number getA() {
-        return a;
+    public String getSuccess() {
+        return success;
     }
 
-    public void setA(Number a) {
-        this.a = a;
+    public void setSuccess(String success) {
+        this.success = success;
     }
 
-    public Long getB() {
-        return b;
+    public String getMessage() {
+        return message;
     }
 
-    public void setB(Long b) {
-        this.b = b;
-    }
-
-    public Long getC() {
-        return c;
-    }
-
-    public void setC(Long c) {
-        this.c = c;
-    }
-
-    public String getD() {
-        return d;
-    }
-
-    public void setD(String d) {
-        this.d = d;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

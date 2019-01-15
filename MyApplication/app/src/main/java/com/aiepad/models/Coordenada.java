@@ -7,6 +7,9 @@ import java.util.List;
 
 public class Coordenada {
 
+
+
+
     @SerializedName("data")
     List<List<String>> data = new ArrayList<>();
 

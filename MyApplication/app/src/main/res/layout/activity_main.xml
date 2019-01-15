@@ -78,16 +78,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center_horizontal"
-                android:text="Click button below to bring up snackbar" />
+                android:text="busqueda de cobranzas  por ID empleado" />
 
             <Button
-                android:onClick="callbackButton"
                 android:layout_width="300dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="50dp"
                 android:backgroundTint="@android:color/holo_blue_light"
-                android:text="Tap To Display Snackbar Message"
+                android:text="versión Beta 0.1 "
                 android:textColor="@android:color/white" />
 
         </LinearLayout>

@@ -22,6 +22,7 @@ import Slide from "@material-ui/core/Slide/Slide";
 
 
 
+
 function Transition(props) {
     return <Slide direction="up" {...props} />;
 }
@@ -205,6 +206,7 @@ class MultipleSelectRimacy extends React.Component {
     };
     componentDidMount() {
         console.log('El componente está disponible en el DOM');
+        console.log("v1/allrutas");
         fetch(this.props.hostdata.host+"v1/allrutas")
             .then((response) => {
                 return response.json();

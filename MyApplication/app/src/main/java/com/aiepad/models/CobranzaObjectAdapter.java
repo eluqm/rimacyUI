@@ -5,10 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aiepad.myapplication.R;
+import com.aiepad.utils.getMarkers;
 import com.google.android.gms.maps.MapView;
 
 import java.text.SimpleDateFormat;
@@ -19,6 +19,8 @@ public class CobranzaObjectAdapter extends ArrayAdapter<CobranzaObject>  impleme
     private ArrayList<CobranzaObject> dataSet;
     Context mContext;
     MapView map;
+    getMarkers utl;
+    String temp="";
     private int lastPosition = -1;
     // View lookup cache
     private static class ViewHolder {
@@ -27,6 +29,7 @@ public class CobranzaObjectAdapter extends ArrayAdapter<CobranzaObject>  impleme
         TextView txtVersion;
         TextView _fechinit;
         TextView _days;
+
         //ImageView info;
     }
 
@@ -35,6 +38,7 @@ public class CobranzaObjectAdapter extends ArrayAdapter<CobranzaObject>  impleme
         //System.out.print("");
         this.dataSet = data;
         this.mContext=context;
+        utl=new getMarkers();
         this.map=map;
 
     }
@@ -56,7 +60,8 @@ public class CobranzaObjectAdapter extends ArrayAdapter<CobranzaObject>  impleme
             convertView = inflater.inflate(R.layout.row_item, parent, false);
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.name);
             viewHolder.txtType = (TextView) convertView.findViewById(R.id.type);
-            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.version_number);
+            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.fecha);
+            viewHolder._days=(TextView) convertView.findViewById(R.id.dias);
             //viewHolder.info = (ImageView) convertView.findViewById(R.id.item_info);
 
             result=convertView;
@@ -68,10 +73,15 @@ public class CobranzaObjectAdapter extends ArrayAdapter<CobranzaObject>  impleme
         }
 
         viewHolder.txtName.setText(dataModel.get_name());
-        viewHolder.txtType.setText(dataModel.get_idCobranza());
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");//formating according to my need
+        viewHolder.txtType.setText(dataModel.get_freq());
+
+        /** date format */
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");//formating according to my need
         String date = formatter.format(dataModel.get_fechIni());
         viewHolder.txtVersion.setText(date);
+
+        /** transform integer to days of week*/
+        viewHolder._days.setText(utl.getNameDays(dataModel.getDias())+"");
         //viewHolder.info.setOnClickListener(this);
         //viewHolder.info.setTag(position);
         return convertView;

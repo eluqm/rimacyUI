@@ -17,7 +17,8 @@ public class CobranzaObject {
     Date _fechIni;
     @SerializedName("idtbl_cobranza")
     String _idCobranza;
-
+    @SerializedName("dias")
+    Integer dias;
     @SerializedName("RUTASZONA")
     String _rutas;
 
@@ -67,6 +68,14 @@ public class CobranzaObject {
 
     public void set_rutas(String _rutas) {
         this._rutas = _rutas;
+    }
+
+    public Integer getDias() {
+        return dias;
+    }
+
+    public void setDias(Integer dias) {
+        this.dias = dias;
     }
 
     @Override

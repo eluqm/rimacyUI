@@ -16,6 +16,8 @@ import com.aiepad.models.CobranzaModel;
 import com.aiepad.models.CobranzaObject;
 import com.aiepad.models.CobranzaObjectAdapter;
 import com.aiepad.models.Coordenada;
+import com.aiepad.models.Coordenadas;
+import com.aiepad.models.CoordenadasObject;
 import com.aiepad.models.Example;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -90,12 +92,13 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
     ArrayList<CobranzaModel> dataModels;
     ArrayList<CobranzaObject> dataModels2;
     List<List<String>> coordenadas = new ArrayList<>();
+    ArrayList<CoordenadasObject> list_coorobjects=new ArrayList<>();
     List<Polygon> polygons = new ArrayList<Polygon>();
     ListView listview;
     MapView mMapView;
     String message;
     Polygon polybeta;
-    GetDataWeb getdata= new GetDataWeb();
+    GetDataWeb getwebdata= new GetDataWeb();
     RequestQueue queue;
 
 
@@ -191,15 +194,15 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         googleMap.setOnPolylineClickListener(this);
         googleMap.setOnPolygonClickListener(this);
 
-        GsonRequest<Cobranza> jsonObjCobranza = new GsonRequest<>("http://174.138.48.60:8080/rimacy/v1/getcobranzasbyempl/" + message,
+        GsonRequest<Cobranza> jsonObjCobranza = new GsonRequest<>(getwebdata.getHostname()+"getcobranzasbyempl_1/" + message,
                 Cobranza.class, null, new Listener<Cobranza>() {
             @Override
             public void onResponse(Cobranza response) {
 
                 dataModels2 = response.getData();
 
-                fillPolygonsbyUser(googleMap);
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-31.673, 128.892),15));
+               // fillPolygonsbyUser(googleMap);
+                //googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-31.673, 128.892),15));
 
                 //list view of Cobranza
 
@@ -208,28 +211,68 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
 
                 listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
                         final CobranzaObject dataModel= dataModels2.get(position);
-                        String url="http://174.138.48.60:8080/rimacy/v1/getcoorbyrutename/"+dataModel.get_rutas();
+                        System.out.println("onclick!!");
+                        System.out.println(dataModel.get_rutas());
+                        String url=getwebdata.getHostname()+"getcoorbyrutename2/"+dataModel.get_rutas();
 
-                        queue.add(getMarkers(new VoleyCallback() {
+                       /* GsonRequest<Coordenadas> jsonObjReq2 = new GsonRequest<Coordenadas>(url,
+                                Coordenadas.class, null, new Listener<Coordenadas>() {
+                            @Override
+                            public void onResponse(Coordenadas response) {
+
+                                //System.out.println("RUTAS"+dataModel.get_rutas());
+                                //list_coorobjects.clear();
+                                //coordenadaList.addAll(response.getData());
+                                list_coorobjects.addAll(response.getData());
+
+                                callBack.onSuccess();
+                                googleMap.clear();
+                                //System.out.println("cobranza id; "+ dataMode.get_idCobranza());
+                                //System.out.print("edson==="+response.getMessage());
+                                // System.out.println("edson==="+list_coorobjects);
+                                System.out.println("ENTREEEEE"+response.getData());
+
+
+
+                            }
+
+
+                        }, new ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                System.out.println("edson===ERROR");
+                                System.out.print(error);
+                            }});*/
+
+                        //queue.add(jsonObjReq2);
+                        queue.add(getMarkers2(new VoleyCallback() {
+                            @Override
+                            public void onSuccess() {}
+                        },url));
+                        /*queue.add(getMarkers2(new VoleyCallback() {
                             @Override
                             public void onSuccess() {
-                                System.out.println(coordenadas);
-                            }
-                        }, url));
 
-                        for(List<String> str:coordenadas){
+                                System.out.println("ACA estan las coordenadas:");
+                                System.out.println(list_coorobjects);
+                            }
+                        }, url));*/
+
+                        /*for(List<String> str:coordenadas){
                             for (String st2:str){
 
                                 System.out.println(st2);
                             }
 
-                        }
-
-                        googleMap.clear();
-                        fillPolygonsbyUser2(googleMap,coordenadas);
-                        deletePolygonsbyUser(0);
+                        }*/
+                        //System.out.println("coordObjects");
+                        //System.out.println(list_coorobjects);
+                       googleMap.clear();
+                       fillPolygonsbyUser3(googleMap,list_coorobjects);
+                       deletePolygonsbyUser(0);
 
 
                     }
@@ -311,7 +354,7 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         }
 
         polygon.setStrokePattern(pattern);
-        polygon.setStrokeWidth(POLYGON_STROKE_WIDTH_PX);
+        polygon.setStrokeWidth(12);
         polygon.setStrokeColor(strokeColor);
         polygon.setFillColor(fillColor);
     }
@@ -400,6 +443,37 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat/count,lon/count),13));
 
     }
+
+    public void fillPolygonsbyUser3(GoogleMap googleMap,List<CoordenadasObject> coord)
+    {
+        Double lat=0.0;
+        Double lon=0.0;
+        Double temp_lat=0.0;
+        Double temp_long=10000000000.0;
+        if(coord.isEmpty()){return;}
+        PolygonOptions opts=new PolygonOptions();
+        for(CoordenadasObject cor:coord)
+        {
+            // to set moveCamera focus mean
+            lat+=Double.parseDouble(cor.getLatitud());
+            lon+=Double.parseDouble(cor.getLongitud());
+            if(Double.parseDouble(cor.getLatitud())>temp_lat){temp_lat=Double.parseDouble(cor.getLatitud());}
+            if(Double.parseDouble(cor.getLongitud())< temp_long){temp_long=Double.parseDouble(cor.getLongitud());}
+            //creating list of coordinates
+            opts.add(new LatLng(Double.parseDouble(cor.getLatitud()),Double.parseDouble(cor.getLongitud())));
+
+        }
+        polybeta = googleMap.addPolygon(opts.clickable(true));
+        //polybeta=add(googleMap.addPolygon(opts.clickable(true)));
+        polybeta.setTag("beta");
+        //polygons.get(0).setTag("beta");
+        //polygons.get(polygons.size()-1).setTag("alpha");
+        stylePolygon(polybeta);
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat/coord.size(),lon/coord.size()),13));
+
+    }
+
     public void deletePolygonsbyUser(Integer index)
     {
 
@@ -433,6 +507,41 @@ public class DisplayMessageActivity extends AppCompatActivity implements OnMapRe
             }});
 
         return jsonObjReq;
+
+    }
+    public  GsonRequest getMarkers2(final VoleyCallback callBack,String url){
+
+        //requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+
+        GsonRequest<Coordenadas> jsonObjReq2 = new GsonRequest<Coordenadas>(url,
+                Coordenadas.class, null, new Listener<Coordenadas>() {
+            @Override
+            public void onResponse(Coordenadas response) {
+
+                //System.out.println("RUTAS"+dataModel.get_rutas());
+                list_coorobjects.clear();
+                //coordenadaList.addAll(response.getData());
+                list_coorobjects.addAll(response.getData());
+                callBack.onSuccess();
+                //System.out.println("cobranza id; "+ dataMode.get_idCobranza());
+                //System.out.print("edson==="+response.getMessage());
+               // System.out.println("edson==="+list_coorobjects);
+                //System.out.println("edson==="+response.getData());
+
+
+
+            }
+
+
+        }, new ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("edson===ERROR");
+                System.out.print(error);
+            }});
+
+        return jsonObjReq2;
 
     }
 }

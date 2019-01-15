@@ -54,8 +54,8 @@ public class CobranzaAdapter extends ArrayAdapter<CobranzaModel> implements View
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.row_item, parent, false);
             viewHolder.txtName = (TextView) convertView.findViewById(R.id.name);
-            viewHolder.txtType = (TextView) convertView.findViewById(R.id.type);
-            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.version_number);
+            viewHolder.txtType = (TextView) convertView.findViewById(R.id.name);
+            viewHolder.txtVersion = (TextView) convertView.findViewById(R.id.fecha);
             viewHolder.info = (ImageView) convertView.findViewById(R.id.item_info);
 
             result=convertView;
